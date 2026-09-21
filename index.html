@@ -31,8 +31,7 @@
       radial-gradient(ellipse at 50% 18%, rgba(196,165,116,0.08), transparent 46%),
       linear-gradient(180deg, rgba(180,190,200,0.06), transparent 28%, rgba(18,24,32,0.18) 100%);
   }
-  .wrap { position: relative; z-index: 1; }
-  .wrap { max-width: 440px; margin: 0 auto; padding: 28px 20px 48px; }
+  .wrap { position: relative; z-index: 1; max-width: 440px; margin: 0 auto; padding: 28px 20px 48px; }
   .hero { text-align: center; margin-bottom: 28px; }
   .eyebrow { letter-spacing: 0.12em; text-transform: uppercase; font-size: 11px; color: var(--accent); margin-bottom: 10px; }
   h1 { font-size: 1.85rem; font-weight: 650; margin: 0 0 8px; letter-spacing: -0.02em; }
@@ -107,7 +106,6 @@
       <h1>Je weet te veel</h1>
       <p class="sub">Het detail dat je niet had mogen weten</p>
     </header>
-
     <div id="gate" class="gate">
       <label for="d0">Vier cijfers</label>
       <div class="code-row">
@@ -120,7 +118,6 @@
       <p class="err" id="err" role="status"></p>
       <p class="hint hidden" id="hint">Vier cijfers, één per ronde, in speelvolgorde.</p>
     </div>
-
     <div id="dossier" class="panel hidden" aria-live="polite">
       <div id="timerBar" class="timer-bar hidden">
         <div class="timer-label">Robin is onderweg — bewijs naar buiten</div>
@@ -132,24 +129,20 @@
           <p class="hint" id="extendHint" style="margin:0"></p>
         </div>
       </div>
-
       <p class="eyebrow" style="text-align:left">Succes</p>
       <h2 style="color:var(--ink);font-size:1.35rem;margin-bottom:6px">Jullie weten te veel</h2>
       <p class="sub" style="margin-bottom:8px">Iemand wilde dat jullie dit lazen. Robin is onderweg. Breng bewijs naar buiten vóór hij er is.</p>
-
       <section class="block">
         <h2>Bevestiging</h2>
         <p>Het “eenzijdige ongeluk in de mist” was een scène. Lena Vos is in of bij het familiehuis om het leven gebracht en daarna op de dijk gezet. Het verkorte politieverslag noemde expres weinig.</p>
         <p>Jullie hebben nu iets in handen dat expres voor jullie is achtergelaten: een lek.</p>
       </section>
-
       <section class="block">
         <h2>Het detail</h2>
         <p><strong>Sam</strong> (collega boekhouding) stopte de brief in de envelop “Niet voor de makelaar”. Sam wilde dat familie die komt opruimen de waarheid zag vóór Robin alles netjes verkocht.</p>
         <p>Lena’s blauwe thermos stond de ochtend ná “het ongeluk” schoon in <strong>dit</strong> keukenkastje. In de auto-inventaris: geen thermos. Wie die fles hier heeft afgewassen, was die nacht in dit huis. Het weerbericht klopt niet met het officiële mist-verhaal op dat tijdstip.</p>
         <p>Jullie zijn geen toevallige speurders. Jullie zijn de bedoelde ontvangers van een tip. En een lek kan worden opgemerkt.</p>
       </section>
-
       <section class="block">
         <h2>Timeline</h2>
         <ul class="timeline">
@@ -161,24 +154,20 @@
           <li><strong>Vanavond</strong> Jullie openen de tip. Robin merkt het lek → onderweg</li>
         </ul>
       </section>
-
       <section class="block">
         <h2>Motief</h2>
         <p>Lena wist van zwartgeld in de administratie van Vos & Zn. Stilte was geen optie meer.</p>
       </section>
-
       <section class="block">
         <h2>Dader</h2>
         <p><strong>Robin Vos</strong>, niet aan tafel. Nu onderweg.</p>
         <p>Tipgever: <strong>Sam</strong>, evenmin aan tafel vanavond.</p>
       </section>
-
       <section class="block">
         <h2>Nieuwe berichten — Robin Vos</h2>
         <div class="chat" id="chat"></div>
         <button type="button" class="secondary" id="nextMsg">Volgende bericht</button>
       </section>
-
       <section class="block" id="climax">
         <h2>Wat doen jullie nu?</h2>
         <p>Hoofdeinde: bewijs naar buiten en politie tippen, zodat Robin op route kan worden onderschept.</p>
@@ -193,13 +182,11 @@
         <div id="ending" class="ending hidden"></div>
       </section>
     </div>
-
     <footer>
       Avond in een doos · digitaal · geen login<br />
       Offline: host leest dossier 05 hardop na correcte code · timer speeltest 12 min.
     </footer>
   </div>
-
 <script>
 (function () {
   const CODE = "2814";
@@ -228,7 +215,6 @@
   const extendBtn = document.getElementById("extendBtn");
   const extendHint = document.getElementById("extendHint");
   const lastChance = document.getElementById("lastChance");
-
   function onTimerZero() {
     if (aDone) return;
     timerBar.classList.add("urgent");
@@ -246,7 +232,6 @@
     ending.innerHTML = "<h2 style=\"margin-top:0\">Te laat voor een schone tip</h2><p>Hij is er bijna. Tik <strong>Laatste kans — stuur nú</strong> of verleng met +5 min om af te maken.</p>";
     document.getElementById("climax").scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
-
   const messages = [
     { who: "Robin", text: "Blijf van die oude dozen af." },
     { who: "Robin", text: "Die bruine envelop was niet voor jullie. Wie heeft jullie daarheen gestuurd?" },
@@ -254,7 +239,6 @@
     { who: "Robin", text: "Twee uur was een schatting. Maak het korter." }
   ];
   let msgIndex = 0;
-
   inputs.forEach((el, i) => {
     el.addEventListener("input", () => {
       el.value = el.value.replace(/\D/g, "").slice(0, 1);
@@ -265,15 +249,12 @@
       if (e.key === "Enter") document.getElementById("openBtn").click();
     });
   });
-
   function readCode() { return inputs.map(i => i.value).join(""); }
-
   function fmt(s) {
     const m = Math.floor(s / 60);
     const r = s % 60;
     return m + ":" + String(r).padStart(2, "0");
   }
-
   function startTimer() {
     if (timerStarted || aDone) return;
     timerStarted = true;
@@ -291,7 +272,6 @@
       }
     }, 1000);
   }
-
   document.getElementById("openBtn").addEventListener("click", () => {
     const c = readCode();
     if (c.length < 4) { err.textContent = "Vul vier cijfers in."; return; }
@@ -307,7 +287,6 @@
     err.textContent = c === "4182" ? "Bijna-huis. Volgorde is ronde 1 tot 4." : "Die code hoort bij een ander huis.";
     if (fails >= 2) hint.classList.remove("hidden");
   });
-
   function showNextMessage() {
     if (msgIndex >= messages.length) {
       nextMsg.classList.add("hidden");
@@ -322,9 +301,7 @@
     if (m.startTimer) startTimer();
     if (msgIndex >= messages.length) nextMsg.classList.add("hidden");
   }
-
   nextMsg.addEventListener("click", showNextMessage);
-
   endA.addEventListener("click", () => {
     aDone = true;
     if (timerId) { clearInterval(timerId); timerId = null; }
@@ -339,7 +316,6 @@
       "<p>Jullie hebben bewijs naar buiten gebracht en een tip gezet: onopgeloste zaak Lena Vos, huis die nacht, Robin onderweg naar dit adres. Onderschep op route of bij aankomst. Jullie gaan naar verlicht / publiek — geen heldendom in het donker alleen.</p>" +
       "<p><em>Het bewijs is buiten. Robin rijdt naar een huis dat jullie al gewonnen hebben.</em></p>";
   });
-
   endB.addEventListener("click", () => {
     if (!aDone) return;
     ending.className = "ending b";
@@ -348,13 +324,11 @@
       "<p>Het bewijs is al buiten. Als Robin binnenkomt: niet eerst het kasboek. Wel thermos/weer en “de politie heeft al een kopie”. Doel: hem laten stoppen met bluffen tot hulp er is — niet solo arresteren.</p>" +
       "<p><em>“We hebben het niet alleen hier. Dus blijf staan. Ze weten al dat je onderweg was.”</em></p>";
   });
-
   lastChance.addEventListener("click", () => {
     document.getElementById("climax").scrollIntoView({ behavior: "smooth", block: "start" });
     endA.focus();
     timerStatus.textContent = "Laatste kans — rond Eind A nu af.";
   });
-
   extendBtn.addEventListener("click", () => {
     if (aDone || extendsUsed >= MAX_EXTENDS) return;
     extendsUsed += 1;
