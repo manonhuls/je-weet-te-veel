@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Je weet te veel · Mist over de polder</title>
+<meta name="robots" content="noindex" />
+<style>
+  :root {
+    --bg: #121820; --bg2: #1a222c; --card: #232d3a; --ink: #e8e4dc;
+    --muted: #a8a296; --accent: #c4a574; --bubble: #2c3848; --danger: #b85c4a;
+    --radius: 14px; --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100dvh; font-family: var(--font); color: var(--ink);
+    line-height: 1.55; font-size: 17px;
+    background:
+      radial-gradient(ellipse at 18% 0%, #3a3228 0%, transparent 42%),
+      radial-gradient(ellipse at 20% 0%, #2a3544 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 100%, #1e2833 0%, transparent 50%),
+      var(--bg);
+  }
+  body::before {
+    content: "";
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse at 50% 18%, rgba(196,165,116,0.08), transparent 46%),
+      linear-gradient(180deg, rgba(180,190,200,0.06), transparent 28%, rgba(18,24,32,0.18) 100%);
+  }
+  .wrap { position: relative; z-index: 1; }
+  .wrap { max-width: 440px; margin: 0 auto; padding: 28px 20px 48px; }
+  .hero { text-align: center; margin-bottom: 28px; }
+  .eyebrow { letter-spacing: 0.12em; text-transform: uppercase; font-size: 11px; color: var(--accent); margin-bottom: 10px; }
+  h1 { font-size: 1.85rem; font-weight: 650; margin: 0 0 8px; letter-spacing: -0.02em; }
+  .sub { color: var(--muted); font-size: 0.95rem; margin: 0; }
+  .gate, .panel {
+    background:
+      linear-gradient(180deg, rgba(196,165,116,0.07), transparent 28%),
+      color-mix(in srgb, var(--card) 92%, black);
+    border: 1px solid #4a3f32; border-radius: var(--radius); padding: 20px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(196,165,116,0.12);
+  }
+  label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 8px; }
+  .code-row { display: flex; gap: 10px; justify-content: center; margin: 12px 0 16px; }
+  .code-row input {
+    width: 52px; height: 58px; text-align: center; font-size: 1.5rem; border-radius: 10px;
+    border: 1px solid #475569; background: var(--bg2); color: var(--ink);
+  }
+  .code-row input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+  button {
+    font: inherit; cursor: pointer; border: none; border-radius: 999px;
+    padding: 14px 20px; width: 100%; background: var(--accent); color: #16120c; font-weight: 650;
+  }
+  button.secondary { background: transparent; color: var(--ink); border: 1px solid #475569; margin-top: 10px; }
+  button:disabled { opacity: 0.45; cursor: default; }
+  .err { color: #e8b4a8; font-size: 0.92rem; min-height: 1.4em; margin: 10px 0 0; text-align: center; }
+  .hint { color: var(--muted); font-size: 0.88rem; text-align: center; margin-top: 8px; }
+  .hidden { display: none !important; }
+  #extendRow:not(.hidden) { display: flex; }
+  section.block { margin-top: 18px; padding-top: 16px; border-top: 1px solid #334155; }
+  section.block:first-of-type { border-top: none; padding-top: 0; }
+  h2 { font-size: 1.1rem; margin: 0 0 8px; color: var(--accent); }
+  p { margin: 0 0 10px; }
+  .timeline { list-style: none; padding: 0; margin: 0; }
+  .timeline li { position: relative; padding: 0 0 12px 16px; border-left: 2px solid #3d4d60; font-size: 0.95rem; }
+  .timeline li::before {
+    content: ""; width: 8px; height: 8px; background: var(--accent); border-radius: 50%;
+    position: absolute; left: -5px; top: 6px;
+  }
+  .timeline strong { display: block; color: var(--muted); font-size: 0.78rem; font-weight: 600; }
+  .chat { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+  .bubble {
+    align-self: flex-start; max-width: 92%; background: var(--bubble);
+    padding: 12px 14px; border-radius: 14px 14px 14px 4px; border: 1px solid #3d4d60;
+    opacity: 0; transform: translateY(8px); transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .bubble.show { opacity: 1; transform: none; }
+  .bubble .who { font-size: 0.75rem; color: var(--accent); margin-bottom: 4px; }
+  .timer-bar {
+    position: sticky; top: 0; z-index: 5; margin: -8px -8px 16px; padding: 12px 14px;
+    border-radius: 12px; background: #1c1412; border: 1px solid #5a4038; text-align: center;
+  }
+  .timer-bar.urgent { border-color: var(--danger); background: #2a1512; }
+  .timer-bar.done { border-color: #3d5a45; background: #1a2a22; }
+  .timer-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .timer-clock { font-size: 2rem; font-weight: 700; font-variant-numeric: tabular-nums; margin: 4px 0; }
+  .check { list-style: none; padding: 0; margin: 0 0 12px; }
+  .check li {
+    display: flex; gap: 10px; align-items: flex-start; padding: 10px 0;
+    border-bottom: 1px solid #334155; font-size: 0.95rem;
+  }
+  .check input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--accent); }
+  .ending { margin-top: 14px; padding: 14px; border-radius: 12px; background: #1a2a22; border: 1px solid #3d5a45; }
+  .ending.b { background: #2a1f1c; border-color: #5a4038; }
+  .ending.late { background: #2a1512; border-color: var(--danger); }
+  footer { margin-top: 28px; text-align: center; color: var(--muted); font-size: 0.78rem; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="eyebrow">Mist over de polder</div>
+      <h1>Je weet te veel</h1>
+      <p class="sub">Het detail dat je niet had mogen weten</p>
+    </header>
+
+    <div id="gate" class="gate">
+      <label for="d0">Vier cijfers</label>
+      <div class="code-row">
+        <input id="d0" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Cijfer 1" />
+        <input id="d1" inputmode="numeric" maxlength="1" aria-label="Cijfer 2" />
+        <input id="d2" inputmode="numeric" maxlength="1" aria-label="Cijfer 3" />
+        <input id="d3" inputmode="numeric" maxlength="1" aria-label="Cijfer 4" />
+      </div>
+      <button type="button" id="openBtn">Open het dossier</button>
+      <p class="err" id="err" role="status"></p>
+      <p class="hint hidden" id="hint">Vier cijfers, één per ronde, in speelvolgorde.</p>
+    </div>
+
+    <div id="dossier" class="panel hidden" aria-live="polite">
+      <div id="timerBar" class="timer-bar hidden">
+        <div class="timer-label">Robin is onderweg — bewijs naar buiten</div>
+        <div class="timer-clock" id="clock">12:00</div>
+        <div class="hint" id="timerStatus">Start zodra je “Ik ben onderweg” leest.</div>
+        <div id="extendRow" class="hidden" style="margin-top:10px;flex-direction:column;gap:8px">
+          <button type="button" id="lastChance" class="secondary" style="margin:0">Laatste kans — stuur nú</button>
+          <button type="button" id="extendBtn" style="margin:0">Toch afronden — +5 min</button>
+          <p class="hint" id="extendHint" style="margin:0"></p>
+        </div>
+      </div>
+
+      <p class="eyebrow" style="text-align:left">Succes</p>
+      <h2 style="color:var(--ink);font-size:1.35rem;margin-bottom:6px">Jullie weten te veel</h2>
+      <p class="sub" style="margin-bottom:8px">Iemand wilde dat jullie dit lazen. Robin is onderweg. Breng bewijs naar buiten vóór hij er is.</p>
+
+      <section class="block">
+        <h2>Bevestiging</h2>
+        <p>Het “eenzijdige ongeluk in de mist” was een scène. Lena Vos is in of bij het familiehuis om het leven gebracht en daarna op de dijk gezet. Het verkorte politieverslag noemde expres weinig.</p>
+        <p>Jullie hebben nu iets in handen dat expres voor jullie is achtergelaten: een lek.</p>
+      </section>
+
+      <section class="block">
+        <h2>Het detail</h2>
+        <p><strong>Sam</strong> (collega boekhouding) stopte de brief in de envelop “Niet voor de makelaar”. Sam wilde dat familie die komt opruimen de waarheid zag vóór Robin alles netjes verkocht.</p>
+        <p>Lena’s blauwe thermos stond de ochtend ná “het ongeluk” schoon in <strong>dit</strong> keukenkastje. In de auto-inventaris: geen thermos. Wie die fles hier heeft afgewassen, was die nacht in dit huis. Het weerbericht klopt niet met het officiële mist-verhaal op dat tijdstip.</p>
+        <p>Jullie zijn geen toevallige speurders. Jullie zijn de bedoelde ontvangers van een tip. En een lek kan worden opgemerkt.</p>
+      </section>
+
+      <section class="block">
+        <h2>Timeline</h2>
+        <ul class="timeline">
+          <li><strong>10–13 nov vorig jaar</strong> Lena vindt ★-kasposten Vos & Zn; concept-mail; afspraak met R. in het huis</li>
+          <li><strong>Nacht 13 / ochtend 14 nov</strong> Confrontatie in huis → moord → auto op dijk</li>
+          <li><strong>Ochtend 14 nov</strong> Thermos terug in keukenkastje; “ongelyk” gemeld</li>
+          <li><strong>16 nov</strong> Krantenbericht; onderzoek snel “afgerond”</li>
+          <li><strong>Recent</strong> Sam stopt tip-brief in “niet voor de makelaar”</li>
+          <li><strong>Vanavond</strong> Jullie openen de tip. Robin merkt het lek → onderweg</li>
+        </ul>
+      </section>
+
+      <section class="block">
+        <h2>Motief</h2>
+        <p>Lena wist van zwartgeld in de administratie van Vos & Zn. Stilte was geen optie meer.</p>
+      </section>
+
+      <section class="block">
+        <h2>Dader</h2>
+        <p><strong>Robin Vos</strong>, niet aan tafel. Nu onderweg.</p>
+        <p>Tipgever: <strong>Sam</strong>, evenmin aan tafel vanavond.</p>
+      </section>
+
+      <section class="block">
+        <h2>Nieuwe berichten — Robin Vos</h2>
+        <div class="chat" id="chat"></div>
+        <button type="button" class="secondary" id="nextMsg">Volgende bericht</button>
+      </section>
+
+      <section class="block" id="climax">
+        <h2>Wat doen jullie nu?</h2>
+        <p>Hoofdeinde: bewijs naar buiten en politie tippen, zodat Robin op route kan worden onderschept.</p>
+        <ul class="check">
+          <li><input type="checkbox" id="c1" /><label for="c1" style="color:inherit;margin:0">Foto’s: Sams brief, ★-admin, agenda 13 nov, weer/inventaris, “print bewaren”</label></li>
+          <li><input type="checkbox" id="c2" /><label for="c2" style="color:inherit;margin:0">Set naar buiten Vos & Zn (politie-tip / vertrouwde derde + eigen cloud)</label></li>
+          <li><input type="checkbox" id="c3" /><label for="c3" style="color:inherit;margin:0">Tip: onopgeloste zaak Lena Vos · huis die nacht · Robin onderweg naar dit adres — onderschep op route</label></li>
+          <li><input type="checkbox" id="c4" /><label for="c4" style="color:inherit;margin:0">Jas aan: verlicht / publiek of weg uit het huis</label></li>
+        </ul>
+        <button type="button" id="endA">Tip verzonden — bewijs is buiten (Eind A)</button>
+        <button type="button" class="secondary" id="endB" disabled>Eind B — Confronteren (alleen ná tip)</button>
+        <div id="ending" class="ending hidden"></div>
+      </section>
+    </div>
+
+    <footer>
+      Avond in een doos · digitaal · geen login<br />
+      Offline: host leest dossier 05 hardop na correcte code · timer speeltest 12 min.
+    </footer>
+  </div>
+
+<script>
+(function () {
+  const CODE = "2814";
+  const DURATION = 12 * 60;
+  const inputs = [0,1,2,3].map(i => document.getElementById("d" + i));
+  const err = document.getElementById("err");
+  const hint = document.getElementById("hint");
+  const gate = document.getElementById("gate");
+  const dossier = document.getElementById("dossier");
+  const chat = document.getElementById("chat");
+  const nextMsg = document.getElementById("nextMsg");
+  const ending = document.getElementById("ending");
+  const timerBar = document.getElementById("timerBar");
+  const clock = document.getElementById("clock");
+  const timerStatus = document.getElementById("timerStatus");
+  const endA = document.getElementById("endA");
+  const endB = document.getElementById("endB");
+  let fails = 0;
+  let aDone = false;
+  let left = DURATION;
+  let timerId = null;
+  let timerStarted = false;
+  let extendsUsed = 0;
+  const MAX_EXTENDS = 2;
+  const extendRow = document.getElementById("extendRow");
+  const extendBtn = document.getElementById("extendBtn");
+  const extendHint = document.getElementById("extendHint");
+  const lastChance = document.getElementById("lastChance");
+
+  function onTimerZero() {
+    if (aDone) return;
+    timerBar.classList.add("urgent");
+    timerStatus.textContent = "Te laat voor een schone tip — hij is er bijna.";
+    extendRow.classList.remove("hidden");
+    if (extendsUsed >= MAX_EXTENDS) {
+      extendBtn.disabled = true;
+      extendHint.textContent = "Geen verlenging meer. Rond Eind A nu af.";
+    } else {
+      extendBtn.disabled = false;
+      extendHint.textContent = "Verlengen mag nog " + (MAX_EXTENDS - extendsUsed) + "× (+5 min).";
+    }
+    ending.className = "ending late";
+    ending.classList.remove("hidden");
+    ending.innerHTML = "<h2 style=\"margin-top:0\">Te laat voor een schone tip</h2><p>Hij is er bijna. Tik <strong>Laatste kans — stuur nú</strong> of verleng met +5 min om af te maken.</p>";
+    document.getElementById("climax").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  const messages = [
+    { who: "Robin", text: "Blijf van die oude dozen af." },
+    { who: "Robin", text: "Die bruine envelop was niet voor jullie. Wie heeft jullie daarheen gestuurd?" },
+    { who: "Robin", text: "Jullie hadden dat niet mogen openen. Wat jullie lazen, bestaat officieel niet. Maak er geen circus van. Ik ben onderweg.", startTimer: true },
+    { who: "Robin", text: "Twee uur was een schatting. Maak het korter." }
+  ];
+  let msgIndex = 0;
+
+  inputs.forEach((el, i) => {
+    el.addEventListener("input", () => {
+      el.value = el.value.replace(/\D/g, "").slice(0, 1);
+      if (el.value && i < 3) inputs[i + 1].focus();
+    });
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Backspace" && !el.value && i > 0) inputs[i - 1].focus();
+      if (e.key === "Enter") document.getElementById("openBtn").click();
+    });
+  });
+
+  function readCode() { return inputs.map(i => i.value).join(""); }
+
+  function fmt(s) {
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return m + ":" + String(r).padStart(2, "0");
+  }
+
+  function startTimer() {
+    if (timerStarted || aDone) return;
+    timerStarted = true;
+    timerBar.classList.remove("hidden");
+    timerStatus.textContent = "Hij komt eraan. Rond Eind A af vóór 0.";
+    clock.textContent = fmt(left);
+    timerId = setInterval(() => {
+      left -= 1;
+      clock.textContent = fmt(Math.max(0, left));
+      if (left <= 60) timerBar.classList.add("urgent");
+      if (left <= 0) {
+        clearInterval(timerId);
+        timerId = null;
+        onTimerZero();
+      }
+    }, 1000);
+  }
+
+  document.getElementById("openBtn").addEventListener("click", () => {
+    const c = readCode();
+    if (c.length < 4) { err.textContent = "Vul vier cijfers in."; return; }
+    if (c === CODE) {
+      err.textContent = "";
+      gate.classList.add("hidden");
+      dossier.classList.remove("hidden");
+      showNextMessage();
+      dossier.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    fails += 1;
+    err.textContent = c === "4182" ? "Bijna-huis. Volgorde is ronde 1 tot 4." : "Die code hoort bij een ander huis.";
+    if (fails >= 2) hint.classList.remove("hidden");
+  });
+
+  function showNextMessage() {
+    if (msgIndex >= messages.length) {
+      nextMsg.classList.add("hidden");
+      return;
+    }
+    const m = messages[msgIndex++];
+    const div = document.createElement("div");
+    div.className = "bubble";
+    div.innerHTML = "<div class=\"who\">" + m.who + "</div><div>" + m.text + "</div>";
+    chat.appendChild(div);
+    requestAnimationFrame(() => div.classList.add("show"));
+    if (m.startTimer) startTimer();
+    if (msgIndex >= messages.length) nextMsg.classList.add("hidden");
+  }
+
+  nextMsg.addEventListener("click", showNextMessage);
+
+  endA.addEventListener("click", () => {
+    aDone = true;
+    if (timerId) { clearInterval(timerId); timerId = null; }
+    timerBar.classList.remove("urgent");
+    timerBar.classList.add("done");
+    extendRow.classList.add("hidden");
+    timerStatus.textContent = "Bewijs is buiten. Timer gestopt.";
+    endB.disabled = false;
+    ending.className = "ending";
+    ending.classList.remove("hidden");
+    ending.innerHTML = "<h2 style=\"margin-top:0\">Eind A — Bewijs veilig · politie tippen</h2>" +
+      "<p>Jullie hebben bewijs naar buiten gebracht en een tip gezet: onopgeloste zaak Lena Vos, huis die nacht, Robin onderweg naar dit adres. Onderschep op route of bij aankomst. Jullie gaan naar verlicht / publiek — geen heldendom in het donker alleen.</p>" +
+      "<p><em>Het bewijs is buiten. Robin rijdt naar een huis dat jullie al gewonnen hebben.</em></p>";
+  });
+
+  endB.addEventListener("click", () => {
+    if (!aDone) return;
+    ending.className = "ending b";
+    ending.classList.remove("hidden");
+    ending.innerHTML = "<h2 style=\"margin-top:0\">Eind B — Confronteren</h2>" +
+      "<p>Het bewijs is al buiten. Als Robin binnenkomt: niet eerst het kasboek. Wel thermos/weer en “de politie heeft al een kopie”. Doel: hem laten stoppen met bluffen tot hulp er is — niet solo arresteren.</p>" +
+      "<p><em>“We hebben het niet alleen hier. Dus blijf staan. Ze weten al dat je onderweg was.”</em></p>";
+  });
+
+  lastChance.addEventListener("click", () => {
+    document.getElementById("climax").scrollIntoView({ behavior: "smooth", block: "start" });
+    endA.focus();
+    timerStatus.textContent = "Laatste kans — rond Eind A nu af.";
+  });
+
+  extendBtn.addEventListener("click", () => {
+    if (aDone || extendsUsed >= MAX_EXTENDS) return;
+    extendsUsed += 1;
+    left = 5 * 60;
+    extendRow.classList.add("hidden");
+    timerBar.classList.remove("urgent");
+    timerStatus.textContent = "+5 min. Verlenging " + extendsUsed + "/" + MAX_EXTENDS + ". Rond Eind A af.";
+    clock.textContent = fmt(left);
+    if (timerId) clearInterval(timerId);
+    timerId = setInterval(() => {
+      left -= 1;
+      clock.textContent = fmt(Math.max(0, left));
+      if (left <= 60) timerBar.classList.add("urgent");
+      if (left <= 0) {
+        clearInterval(timerId);
+        timerId = null;
+        onTimerZero();
+      }
+    }, 1000);
+  });
+})();
+</script>
+</body>
+</html>
